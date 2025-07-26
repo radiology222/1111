@@ -1,0 +1,77 @@
+# ----------------------------------------------------------------------- #
+#                                                                         #
+#                               YMAL文件语法                               #
+#                       http://medai.icu/thread/677                       #
+#                                                                         #
+# ----------------------------------------------------------------------- #
+
+### ------------------------ 深度学习任务配置 ------------------------ ###
+# 使用Step0生成的数据划分的数据，在split_info文件夹
+train_file: split_info\train-RND-0.txt
+val_file: split_info\val-RND-0.txt
+# label文件位置，注意这里需要是多中心的配置，包括group信息。
+label_file: split_info\label-RND-0.csv
+task_column: label
+dataset_column: group
+# 自己数据存放的目录。一般是由OKT-crop_max_ro工具生成, --axis_3d 4，需要裁剪3d VOI。
+data_pattern: E:\OnekeyDS\CT\images
+# 你选择的模型名称
+# | **模型系列** | **模型名称**                                                 |
+# | ------------ | ------------------------------------------------------------ |
+# | ResNet       | resnet10, resnet18, resnet34, resnet50, resnet101, resnet152, resnet200 |
+# | DenseNet     | DenseNet121, DenseNet201, DenseNet169, DenseNet264           |
+# | ShuffleNet   | ShuffleNet |
+# | VisionTransformer     | ViT, SimpleViT, CCT         |
+# | OnekeyAI | UNetClassification |     
+# CCT论文：https://zhuanlan.zhihu.com/p/364710161
+model_names: [resnet101, DenseNet121, ShuffleNet, SimpleViT]
+sel_dl_model_name: DenseNet121
+# 这个不用动，模型存放的位置
+model_root: dl_models
+# CNN 100+，ViT模型600+
+epoch: 3
+
+### ------------------------ 传统组学任务配置 ------------------------ ###
+# 影像数据存放位置，需要确保该目录下存在images和masks文件夹。
+radio_dir: C:\Users\onekey\Desktop\demo
+
+# 特征提取的配置文件位置
+extractor_settings:
+# 使用MRMR模型筛选特征, 不输入数据的时候，不使用mRMR，默认不使用
+mrmr_sel_feature_num: 
+ml_models:
+  - LR
+  - SVM
+  - KNN
+  - RandomForest
+  - ExtraTrees
+  - XGBoost
+  - LightGBM
+  - MLP
+
+### ------------------------ 传统组学+深度学习任务配置 ------------------------ ###
+# 使用ctl c+ ctl v拼接之后的特征文件
+combined_feature_file: 
+dl_feature_file: features\resnet101_compress_features.csv
+rad_feature_file: features/rad_features.csv
+
+### ------------------------ 临床任务配置 ------------------------ ###
+clinic_file: C:\Users\onekey\Desktop\demo\Clinical.csv
+# 用于做临床特征筛选的pvalue
+p_value: 0.05
+
+### ------------------------ 汇总任务配置 ------------------------ ###
+# ROC、校准、DCA、Delong汇总对比的模型。
+summary_models: [Clinic, Rad, DTL, DLR, ]
+# 使用什么模型与临床特征进行融合，得到最终的Nomogram
+fusion_models: [DLR]
+sel_model: 
+  Clinic: LR
+  Rad: LR
+  DTL: resnet101
+  DLR: LR
+  
+subsets: [train, test]
+font.size: 12
+DISABLE_VIDEO: True
+PAPER_TMP: Radiomics3DL
